@@ -17,3 +17,10 @@ deny[msg] {
 	kms.health_check.path != "/v1/sys/health?standbyok=true&uninitcode=200&sealedcode=200"
 	msg = sprintf("LB `%v` healthcheck not set correctly", [name])
 }
+
+deny[msg] {
+	rule := input.resource.aws_security_group_rule[name]
+	rule.type == "ingress"
+	contains(rule.cidr_blocks[_], "0.0.0.0/0")
+	msg = sprintf("SG Rule `%v` defines a fully open ingress", [name])
+}
